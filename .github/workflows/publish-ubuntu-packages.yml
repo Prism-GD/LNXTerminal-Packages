@@ -35,7 +35,7 @@ jobs:
           rm -rf pool/main/*
           mkdir -p dists/resolute/main/binary-arm64 dists/resolute/main/binary-armhf
 
-          for file in "$debs[@]"; do
+          for file in "${debs[@]}"; do
             arch="$(dpkg-deb -f "$file" Architecture)"
             name="$(dpkg-deb -f "$file" Package)"
             version="$(dpkg-deb -f "$file" Version)"
