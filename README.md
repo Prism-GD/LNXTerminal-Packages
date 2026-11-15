@@ -1,45 +1,52 @@
 # LNXTerminal Packages
 
-Public package repository for **LNXTerminal**.
+Public APT package repository for **LNXTerminal**.
 
 ## Target platform
 
 - Base distribution: **Ubuntu 26.04 LTS (Resolute Raccoon)**
 - Ubuntu suite: `resolute`
-- Initial package component: `main`
-- Planned CPU architectures:
-  - `arm64` — Android ABI `arm64-v8a`
-  - `armhf` — Android ABI `armeabi-v7a`, when compatible
+- Component: `main`
+- Published architecture: `arm64` (Debian architecture; Android ABI `arm64-v8a`)
+- Planned architecture: `armhf` (Android ABI `armeabi-v7a`), not yet populated with packages
 
 The Android ABI and Debian package architecture are related but are not interchangeable labels. The app/runtime must detect the device ABI and use a compatible Ubuntu root filesystem and package architecture.
 
 ## Repository status
 
-This repository is being prepared. **It does not contain installable packages yet.** Do not add empty or placeholder `Packages`, `Release`, or `.deb` files: APT metadata must be generated from real, validated Debian packages.
+The repository now contains real Ubuntu ARM64 `.deb` packages and generated APT indexes. The Release metadata is signed with the LNXTerminal archive key. The publishing workflow also verifies the repository using an APT client before publishing.
 
-Planned APT layout:
+APT layout:
 
 ```text
 dists/
   resolute/
+    InRelease
+    Release
+    Release.gpg
     main/
       binary-arm64/
         Packages
-      binary-armhf/
-        Packages
+        Packages.gz
 pool/
   main/
     <package-name>/
       <version>/
         <package-file>.deb
+keys/
+  lnxterminal-archive-keyring.asc
 ```
 
-The package index and Release metadata will be generated and checked automatically when actual packages are published. Repository signing will be configured before the repository is used by default.
+**The repository has not yet been tested as a remotely hosted APT endpoint.** Do not add it to a device until its hosting URL and end-to-end client test are confirmed.
+
+## Signing key
+
+The public archive key is available at [keys/lnxterminal-archive-keyring.asc](keys/lnxterminal-archive-keyring.asc). The matching private key must remain only in the GitHub Actions repository secret named `APT_SIGNING_PRIVATE_KEY`; never commit or share the private key.
 
 ## Important
 
-- This is a repository for LNXTerminal-specific packages, not a mirror of the full Ubuntu archive.
-- Ubuntu's official repositories will remain the source for standard Ubuntu packages.
+- This is a curated repository, not a mirror of the complete Ubuntu archive.
+- Ubuntu's official repositories remain the source for standard Ubuntu packages and dependencies not included here.
 - Packages must declare dependencies, versions, architecture, checksums, and maintainer metadata correctly.
 - Never publish untrusted or unreviewed binaries.
 
