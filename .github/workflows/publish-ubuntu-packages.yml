@@ -18,11 +18,16 @@ jobs:
         with:
           persist-credentials: true
 
+      - name: Enable ARM64 emulation
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
       - name: Download real Ubuntu packages and dependencies
         run: |
           set -euo pipefail
           mkdir -p staging
-          docker run --rm --platform linux/amd64 \
+          docker run --rm --platform linux/arm64 \
             -v "$PWD/staging:/staging" \
             ubuntu:26.04 bash -euxo pipefail -c '
               export DEBIAN_FRONTEND=noninteractive
@@ -30,8 +35,8 @@ jobs:
               printf "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports resolute main universe\n" > /etc/apt/sources.list
               printf "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports resolute-updates main universe\n" >> /etc/apt/sources.list
               printf "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports resolute-security main universe\n" >> /etc/apt/sources.list
-              apt-get -o APT::Architecture=arm64 -o APT::Architectures=arm64 update
-              apt-get -o APT::Architecture=arm64 -o APT::Architectures=arm64 install -y --download-only --no-install-recommends nano python3 git curl wget
+              apt-get update
+              apt-get install -y --download-only --no-install-recommends nano python3 git curl wget
               find /var/cache/apt/archives -maxdepth 1 -type f -name "*.deb" -exec cp -v {} /staging/ \;
             '
 
