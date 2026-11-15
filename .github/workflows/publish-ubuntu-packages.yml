@@ -77,7 +77,7 @@ jobs:
 
       - name: Sign APT repository metadata
         env:
-          APT_SIGNING_PRIVATE_KEY: ${{ secrets.APT_SIGNING_PRIVATE_KEY }}
+          APT_SIGNING_PRIVATE_KEY: \${{ secrets.APT_SIGNING_PRIVATE_KEY }}
         run: |
           set -euo pipefail
           test -n "$APT_SIGNING_PRIVATE_KEY" || { echo "Missing APT_SIGNING_PRIVATE_KEY repository secret."; exit 1; }
@@ -111,6 +111,7 @@ jobs:
           grep -q '^Architecture: arm64$' "$RUNNER_TEMP/nano-package.txt"
           grep -q '^Filename: pool/main/nano/' "$RUNNER_TEMP/nano-package.txt"
           echo "APT verified the signature and loaded the ARM64 nano package index."
+
       - name: Commit and publish packages
         run: |
           set -euo pipefail
@@ -124,20 +125,4 @@ jobs:
           git commit -m "packages: publish Ubuntu Resolute arm64 package set"
           git fetch origin main
           git rebase origin/main
-          git push
- "$RUNNER_TEMP/nano-package.txt"
-          grep -q '^Filename: pool/main/nano/' "$RUNNER_TEMP/nano-package.txt"
-          echo "APT verified the signature and loaded the ARM64 nano package index."
-
-      - name: Commit and publish packages
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pool dists
-          if git diff --cached --quiet; then
-            echo "No package changes to publish."
-            exit 0
-          fi
-          git commit -m "packages: publish Ubuntu Resolute arm64 package set"
           git push
