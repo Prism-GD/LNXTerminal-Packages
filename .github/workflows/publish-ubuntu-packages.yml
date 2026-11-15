@@ -64,7 +64,15 @@ jobs:
           mkdir -p dists/resolute/main/binary-arm64
           apt-ftparchive packages pool/main > dists/resolute/main/binary-arm64/Packages
           gzip -9c dists/resolute/main/binary-arm64/Packages > dists/resolute/main/binary-arm64/Packages.gz
-          apt-ftparchive release dists/resolute > dists/resolute/Release
+          apt-ftparchive \
+            -o APT::FTPArchive::Release::Origin="LNXTerminal" \
+            -o APT::FTPArchive::Release::Label="LNXTerminal Packages" \
+            -o APT::FTPArchive::Release::Suite="resolute" \
+            -o APT::FTPArchive::Release::Codename="resolute" \
+            -o APT::FTPArchive::Release::Architectures="arm64" \
+            -o APT::FTPArchive::Release::Components="main" \
+            release dists/resolute > "$RUNNER_TEMP/Release"
+          mv "$RUNNER_TEMP/Release" dists/resolute/Release
           echo "Repository metadata generated."
 
       - name: Sign APT repository metadata
@@ -83,6 +91,23 @@ jobs:
           gpg --batch --yes --local-user "$fingerprint" --clearsign \
             --output dists/resolute/InRelease dists/resolute/Release
           echo "APT Release metadata signed successfully."
+
+      - name: Verify repository with APT
+        run: |
+          set -euo pipefail
+          sudo install -d -m 755 /usr/share/keyrings
+          sudo gpg --dearmor --yes --output /usr/share/keyrings/lnxterminal-archive-keyring.gpg keys/lnxterminal-archive-keyring.asc
+          mkdir -p "$RUNNER_TEMP/lnxterminal-apt-lists/partial"
+          printf 'deb [arch=arm64 signed-by=/usr/share/keyrings/lnxterminal-archive-keyring.gpg] file:%s resolute main\\n' "$GITHUB_WORKSPACE" > "$RUNNER_TEMP/lnxterminal-test.list"
+          sudo apt-get \
+            -o Dir::Etc::sourcelist="$RUNNER_TEMP/lnxterminal-test.list" \
+            -o Dir::Etc::sourceparts="-" \
+            -o Dir::State::lists="$RUNNER_TEMP/lnxterminal-apt-lists" \
+            -o APT::Architecture=arm64 update
+          apt-cache \
+            -o Dir::State::lists="$RUNNER_TEMP/lnxterminal-apt-lists" \
+            -o APT::Architecture=arm64 policy nano
+          echo "APT accepted the signed repository metadata."
 
       - name: Commit and publish packages
         run: |
