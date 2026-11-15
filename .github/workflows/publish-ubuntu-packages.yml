@@ -2,7 +2,9 @@ name: Publish Ubuntu .deb packages
 
 on:
   workflow_dispatch:
-  # Manual first run keeps package downloads and repository growth under control.
+  push:
+    paths:
+      - '.github/workflows/publish-ubuntu-packages.yml'
 
 permissions:
   contents: write
