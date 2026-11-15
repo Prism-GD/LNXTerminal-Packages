@@ -29,7 +29,7 @@ jobs:
           set -euo pipefail
           mkdir -p packages pool/main
           shopt -s nullglob
-          debs=(${debs[@]})
+          debs=(packages/*.deb)
 
           # Remove old Ubuntu mirror content. Only project-owned packages belong here.
           rm -rf pool/main/*
