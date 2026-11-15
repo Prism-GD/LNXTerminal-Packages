@@ -1,0 +1,15 @@
+Package: lnxterminal-hello
+Version: 0.1.0
+Architecture: all
+Maintainer: Prism-GD <prism-gd@users.noreply.github.com>
+Filename: pool/main/lnxterminal-hello/lnxterminal-hello_0.1.0_all.deb
+Size: 730
+MD5sum: 6768c329b70d58678a585984cc81945e
+SHA1: 44c2dbd23c0b7373472b7e5a9f60f29ffa0c3b28
+SHA256: 483683c07695db40ee37cf580660a6edf2267883368cf2be076e92024835f844
+Section: utils
+Priority: optional
+Description: First test package for LNXTerminal
+ A small diagnostic command confirming that LNXTerminal's custom
+ package repository and shell integration are available.
+
