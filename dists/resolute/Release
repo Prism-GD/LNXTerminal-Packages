@@ -1,25 +1,31 @@
-Date: Sun, 15 Nov 2026 01:15:47 +0000
+Architectures: arm64 armhf
+Codename: resolute
+Components: main
+Date: Sun, 15 Nov 2026 02:24:07 +0000
+Label: LNXTerminal Packages
+Origin: LNXTerminal
+Suite: resolute
 MD5Sum:
- acc55d5c345a562198369986f6096e72               38 Release
- b1a0b4ae7c34ca49bfce4c0d1ff8c31a            76624 main/binary-arm64/Packages
- b83c0399ba41ca59d3560beb44a42b50            24345 main/binary-arm64/Packages.gz
- e81699fbe44e64ead1265c8d39fe0247              563 main/binary-armhf/Packages
- 91f043ac86563698429391866a3abaae              402 main/binary-armhf/Packages.gz
+ 6dd36911cad8ce06b7438d1d3ed4b11f             2256 Release
+ d41d8cd98f00b204e9800998ecf8427e                0 main/binary-arm64/Packages
+ fdcb1fec10de8b973beeafacab189c95               29 main/binary-arm64/Packages.gz
+ d41d8cd98f00b204e9800998ecf8427e                0 main/binary-armhf/Packages
+ fdcb1fec10de8b973beeafacab189c95               29 main/binary-armhf/Packages.gz
 SHA1:
- f54f753968ee9907f6ed47a59beff7596646ab93               38 Release
- 6893a31ed9b134f872ad2317fb849fcb3c9d3662            76624 main/binary-arm64/Packages
- c8ae9c620b69ed6ff874128d9229e2b38595feda            24345 main/binary-arm64/Packages.gz
- cdfdfc13eaba7792df744097592c292cdb3e180a              563 main/binary-armhf/Packages
- ea1c11db72723fc263d57b1b75f0ff69167a6fbb              402 main/binary-armhf/Packages.gz
+ b66ba93a709fd081083e9e8e6c4ef87d69725b88             2256 Release
+ da39a3ee5e6b4b0d3255bfef95601890afd80709                0 main/binary-arm64/Packages
+ b5fa214e012f57666350b11ea1693dd3b82549e3               29 main/binary-arm64/Packages.gz
+ da39a3ee5e6b4b0d3255bfef95601890afd80709                0 main/binary-armhf/Packages
+ b5fa214e012f57666350b11ea1693dd3b82549e3               29 main/binary-armhf/Packages.gz
 SHA256:
- 4419d66d264ffd27ea56659ac33441218c4c3bb93685991959b4041e113afc2f               38 Release
- 40688ec312766359ba65c6adc59f6ecce61b00a5e723944118a9d62ff1402f12            76624 main/binary-arm64/Packages
- d3e7bf23256c095b2bcffee21714932810431f6b50020bb9be67f4810e3547b8            24345 main/binary-arm64/Packages.gz
- 8250d98379d3e39b4c6b5943db5396aeb150d518c84b5a3849a903000c5af32c              563 main/binary-armhf/Packages
- ce66109729a523d0dfc72b35f6b4e9303ac74b492c06312f5842b41e3ab91d51              402 main/binary-armhf/Packages.gz
+ 643a7e58eb3967e64666e3bd3f0575411692751e9420704b552b9942b0f8d451             2256 Release
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855                0 main/binary-arm64/Packages
+ 189214a9b4a5f483691bdc468b5f07d2074eab133ea40b6b606b534b41828874               29 main/binary-arm64/Packages.gz
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855                0 main/binary-armhf/Packages
+ 189214a9b4a5f483691bdc468b5f07d2074eab133ea40b6b606b534b41828874               29 main/binary-armhf/Packages.gz
 SHA512:
- c438f85c3b51a123bbab9fc84a234946424c462aca55d6945e24825c94ef4216b75cbef089ee12c7c955635abda21651c6357b1f02804487c8b7549f7d32b126               38 Release
- 64ce331691d0803f099deb105f53f4e7304034337625f13a3530c5d9969d92f5811b569621c1743ae41d9198c132c1cd9214188584a684d0d51066c3526c1a7c            76624 main/binary-arm64/Packages
- 2e13fc4c9f93e95b811bd004aa26bfde3a5807a6c3925badc05c1bdc5b47aa47a2aa3d28b0cafe7bb7dc3a4cfa71cc9b71acf4cd578e0a5117a1259800a7ec1c            24345 main/binary-arm64/Packages.gz
- b8ac6d3c8f42281129b85a60a2fc71ce75c951a25ab82d9aa88301bb61bcbe037ea6948be3b60ff9916989e391a582d9ef01feae9d9964378c3f0d40200293e1              563 main/binary-armhf/Packages
- bf2c1a9e773ac1dbacc433f0c855c0a46913458b78c567bf026c6da2a8f4615550782dcf27f3a411b474bb17d9b333c2b67f583ef363dc930c2619018f7c8b68              402 main/binary-armhf/Packages.gz
+ db88d53e7ddc0f1bb935a378fcc8e010d245d8453be4cf8d0e245c27b356e6952a56fe90c63b2be0dc14c9fec35588e1dde8be52d3737b9ff57ce2356fd8264a             2256 Release
+ cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e                0 main/binary-arm64/Packages
+ 41e069d226446481df5aac63c41dcd34a6681777b2cad3a3c3ed4412acc0680043d8ebd3301098b8654c9eadfa0c36c4a65352e4373c9f258d1ab4e63caf5b9b               29 main/binary-arm64/Packages.gz
+ cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e                0 main/binary-armhf/Packages
+ 41e069d226446481df5aac63c41dcd34a6681777b2cad3a3c3ed4412acc0680043d8ebd3301098b8654c9eadfa0c36c4a65352e4373c9f258d1ab4e63caf5b9b               29 main/binary-armhf/Packages.gz
