@@ -1,16 +1,17 @@
-name: Publish Ubuntu .deb packages
+name: Publish LNXTerminal packages
 
 on:
   workflow_dispatch:
   push:
     paths:
+      - 'packages/**'
       - '.github/workflows/publish-ubuntu-packages.yml'
 
 permissions:
   contents: write
 
 jobs:
-  publish-arm64:
+  publish:
     runs-on: ubuntu-24.04
     steps:
       - name: Check out package repository
@@ -18,66 +19,62 @@ jobs:
         with:
           persist-credentials: true
 
-      - name: Enable ARM64 emulation
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
-
-      - name: Download real Ubuntu packages and dependencies
-        run: |
-          set -euo pipefail
-          mkdir -p staging
-          docker run --rm --platform linux/arm64 \
-            -v "$PWD/staging:/staging" \
-            ubuntu:26.04 bash -euxo pipefail -c '
-              export DEBIAN_FRONTEND=noninteractive
-              rm -f /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list
-              printf "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports resolute main universe\n" > /etc/apt/sources.list
-              printf "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports resolute-updates main universe\n" >> /etc/apt/sources.list
-              printf "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports resolute-security main universe\n" >> /etc/apt/sources.list
-              apt-get update
-              apt-get install -y --download-only --no-install-recommends nano python3 git curl wget
-              find /var/cache/apt/archives -maxdepth 1 -type f -name "*.deb" -exec cp -v {} /staging/ \;
-            '
-
-      - name: Install repository metadata tools
+      - name: Install APT metadata tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y apt-utils
+          sudo apt-get install -y apt-utils gnupg
 
-      - name: Validate and arrange package files
+      - name: Validate and arrange LNXTerminal packages
         run: |
           set -euo pipefail
-          test -n "$(find staging -maxdepth 1 -type f -name '*.deb' -print -quit)"
-          mkdir -p pool/main
-          while IFS= read -r -d '' file; do
+          mkdir -p packages pool/main
+          shopt -s nullglob
+          debs=(${debs[@]})
+
+          # Remove old Ubuntu mirror content. Only project-owned packages belong here.
+          rm -rf pool/main/*
+          mkdir -p dists/resolute/main/binary-arm64 dists/resolute/main/binary-armhf
+
+          for file in "$debs[@]"; do
             arch="$(dpkg-deb -f "$file" Architecture)"
             name="$(dpkg-deb -f "$file" Package)"
             version="$(dpkg-deb -f "$file" Version)"
-            test "$arch" = "arm64" || test "$arch" = "all" || { echo "Unexpected architecture $arch in $file"; exit 1; }
+
+            case "$name" in
+              lnxterminal-*) ;;
+              *) echo "Refusing non-LNXTerminal package: $name"; exit 1 ;;
+            esac
+
+            case "$arch" in
+              arm64|armhf|all) ;;
+              *) echo "Unsupported package architecture: $arch"; exit 1 ;;
+            esac
+
             dest="pool/main/$name/$version"
             mkdir -p "$dest"
             cp "$file" "$dest/"
             dpkg-deb --info "$dest/$(basename "$file")" >/dev/null
-          done < <(find staging -maxdepth 1 -type f -name '*.deb' -print0)
-          rm -rf staging
-          mkdir -p dists/resolute/main/binary-arm64
+          done
+
           apt-ftparchive packages pool/main > dists/resolute/main/binary-arm64/Packages
           gzip -9c dists/resolute/main/binary-arm64/Packages > dists/resolute/main/binary-arm64/Packages.gz
+          cp dists/resolute/main/binary-arm64/Packages dists/resolute/main/binary-armhf/Packages
+          gzip -9c dists/resolute/main/binary-armhf/Packages > dists/resolute/main/binary-armhf/Packages.gz
+
           apt-ftparchive \
             -o APT::FTPArchive::Release::Origin="LNXTerminal" \
             -o APT::FTPArchive::Release::Label="LNXTerminal Packages" \
             -o APT::FTPArchive::Release::Suite="resolute" \
             -o APT::FTPArchive::Release::Codename="resolute" \
-            -o APT::FTPArchive::Release::Architectures="arm64" \
+            -o APT::FTPArchive::Release::Architectures="arm64 armhf" \
             -o APT::FTPArchive::Release::Components="main" \
             release dists/resolute > "$RUNNER_TEMP/Release"
           mv "$RUNNER_TEMP/Release" dists/resolute/Release
-          echo "Repository metadata generated."
+          echo "LNXTerminal-only package indexes generated."
 
       - name: Sign APT repository metadata
         env:
-          APT_SIGNING_PRIVATE_KEY: \${{ secrets.APT_SIGNING_PRIVATE_KEY }}
+          APT_SIGNING_PRIVATE_KEY: ${{ secrets.APT_SIGNING_PRIVATE_KEY }}
         run: |
           set -euo pipefail
           test -n "$APT_SIGNING_PRIVATE_KEY" || { echo "Missing APT_SIGNING_PRIVATE_KEY repository secret."; exit 1; }
@@ -92,7 +89,7 @@ jobs:
             --output dists/resolute/InRelease dists/resolute/Release
           echo "APT Release metadata signed successfully."
 
-      - name: Verify repository with APT
+      - name: Verify signed repository with APT
         run: |
           set -euo pipefail
           sudo install -d -m 755 /usr/share/keyrings
@@ -105,24 +102,19 @@ jobs:
             -o Dir::Etc::sourceparts="-" \
             -o Dir::State::lists="$RUNNER_TEMP/lnxterminal-apt-lists" \
             -o APT::Architecture=arm64 update
-          apt-cache \
-            -o Dir::State::lists="$RUNNER_TEMP/lnxterminal-apt-lists" \
-            -o APT::Architecture=arm64 show nano | tee "$RUNNER_TEMP/nano-package.txt"
-          grep -q '^Architecture: arm64$' "$RUNNER_TEMP/nano-package.txt"
-          grep -q '^Filename: pool/main/nano/' "$RUNNER_TEMP/nano-package.txt"
-          echo "APT verified the signature and loaded the ARM64 nano package index."
+          echo "APT verified the LNXTerminal repository signature and indexes."
 
-      - name: Commit and publish packages
+      - name: Commit and publish repository
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pool dists
+          git add -A packages pool dists
           if git diff --cached --quiet; then
-            echo "No package changes to publish."
+            echo "No repository changes to publish."
             exit 0
           fi
-          git commit -m "packages: publish Ubuntu Resolute arm64 package set"
+          git commit -m "repo: publish LNXTerminal packages only"
           git fetch origin main
           git rebase origin/main
           git push
