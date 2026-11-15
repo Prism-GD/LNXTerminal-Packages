@@ -1,54 +1,54 @@
 # LNXTerminal Packages
 
-Public APT package repository for **LNXTerminal**.
+Public APT repository for packages maintained specifically for **LNXTerminal**.
 
-## Target platform
+## Repository design
 
-- Base distribution: **Ubuntu 26.04 LTS (Resolute Raccoon)**
+Standard Linux packages are downloaded directly from the official Ubuntu repositories. This repository is reserved for LNXTerminal-owned packages and customizations.
+
+- Official Ubuntu packages: Ubuntu archive (`ports.ubuntu.com` for ARM devices)
+- LNXTerminal packages: this repository
+- Package manager: APT
 - Ubuntu suite: `resolute`
 - Component: `main`
-- Published architecture: `arm64` (Debian architecture; Android ABI `arm64-v8a`)
-- Planned architecture: `armhf` (Android ABI `armeabi-v7a`), not yet populated with packages
+- Architectures: `arm64` and `armhf`
 
-The Android ABI and Debian package architecture are related but are not interchangeable labels. The app/runtime must detect the device ABI and use a compatible Ubuntu root filesystem and package architecture.
+## What belongs here
 
-## Repository status
+Only packages whose Debian package name begins with `lnxterminal-` are accepted by the publishing workflow. Planned examples include:
 
-The repository now contains real Ubuntu ARM64 `.deb` packages and generated APT indexes. The Release metadata is signed with the LNXTerminal archive key. The publishing workflow also verifies the repository using an APT client before publishing.
+- `lnxterminal-core` — integration files and terminal configuration
+- `lnxterminal-sudo` — sudo configuration inside the Ubuntu PRoot environment
+- `lnxterminal-custom` — LNXTerminal customizations
+- `lnxterminal-tools` — project-specific utilities
 
-APT layout:
+These are planned package names, not claims that the packages already exist.
 
-```text
-dists/
-  resolute/
-    InRelease
-    Release
-    Release.gpg
-    main/
-      binary-arm64/
-        Packages
-        Packages.gz
-pool/
-  main/
-    <package-name>/
-      <version>/
-        <package-file>.deb
-keys/
-  lnxterminal-archive-keyring.asc
-```
+## Adding a package
 
-**The repository has not yet been tested as a remotely hosted APT endpoint.** Do not add it to a device until its hosting URL and end-to-end client test are confirmed.
+Place a genuine, reviewed `.deb` package in the `packages/` directory and run the **Publish LNXTerminal packages** workflow. The workflow validates its package name and architecture, creates the APT indexes, signs the Release metadata, verifies the repository with APT, and publishes the result.
 
-## Signing key
+Supported package architectures: `arm64`, `armhf`, and `all`.
 
-The public archive key is available at [keys/lnxterminal-archive-keyring.asc](keys/lnxterminal-archive-keyring.asc). The matching private key must remain only in the GitHub Actions repository secret named `APT_SIGNING_PRIVATE_KEY`; never commit or share the private key.
+## Repository signing
+
+The public archive key is available at [keys/lnxterminal-archive-keyring.asc](keys/lnxterminal-archive-keyring.asc). The matching private key must remain only in the GitHub Actions secret `APT_SIGNING_PRIVATE_KEY`. Never commit or share the private key.
+
+## APT sources
+
+A LNXTerminal installation should configure both sources:
+
+1. The official Ubuntu source matching the installed Ubuntu suite and device architecture.
+2. This LNXTerminal source, using the published public key with `signed-by=`.
+
+Do not disable APT signature verification. The exact public hosting endpoint and client installation instructions will be documented after remote hosting is tested.
 
 ## Important
 
-- This is a curated repository, not a mirror of the complete Ubuntu archive.
-- Ubuntu's official repositories remain the source for standard Ubuntu packages and dependencies not included here.
-- Packages must declare dependencies, versions, architecture, checksums, and maintainer metadata correctly.
-- Never publish untrusted or unreviewed binaries.
+- This is not an Ubuntu mirror.
+- Ubuntu remains responsible for standard packages and their dependencies.
+- The LNXTerminal repository must contain only project-owned packages.
+- Package dependencies must be available from Ubuntu or from another explicitly configured trusted source.
 
 ## Project
 
