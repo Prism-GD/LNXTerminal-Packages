@@ -24,6 +24,7 @@ jobs:
             -v "$PWD/staging:/staging" \
             ubuntu:26.04 bash -euxo pipefail -c '
               export DEBIAN_FRONTEND=noninteractive
+              rm -f /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list
               printf "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports resolute main universe\n" > /etc/apt/sources.list
               printf "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports resolute-updates main universe\n" >> /etc/apt/sources.list
               printf "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports resolute-security main universe\n" >> /etc/apt/sources.list
@@ -31,6 +32,11 @@ jobs:
               apt-get -o APT::Architecture=arm64 -o APT::Architectures=arm64 install -y --download-only --no-install-recommends nano python3 git curl wget
               find /var/cache/apt/archives -maxdepth 1 -type f -name "*.deb" -exec cp -v {} /staging/ \;
             '
+
+      - name: Install repository metadata tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apt-utils
 
       - name: Validate and arrange package files
         run: |
@@ -41,7 +47,7 @@ jobs:
             arch="$(dpkg-deb -f "$file" Architecture)"
             name="$(dpkg-deb -f "$file" Package)"
             version="$(dpkg-deb -f "$file" Version)"
-            test "$arch" = "arm64" || { echo "Unexpected architecture $arch in $file"; exit 1; }
+            test "$arch" = "arm64" || test "$arch" = "all" || { echo "Unexpected architecture $arch in $file"; exit 1; }
             dest="pool/main/$name/$version"
             mkdir -p "$dest"
             cp "$file" "$dest/"
