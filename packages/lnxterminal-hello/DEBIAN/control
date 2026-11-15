@@ -1,0 +1,9 @@
+Package: lnxterminal-hello
+Version: 0.1.0
+Section: utils
+Priority: optional
+Architecture: all
+Maintainer: Prism-GD <packages@prism-gd.invalid>
+Description: First test package for LNXTerminal
+ A small diagnostic command confirming that LNXTerminal's custom
+ package repository and shell integration are available.
