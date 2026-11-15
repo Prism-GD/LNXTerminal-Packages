@@ -1,0 +1,15 @@
+{
+  "distribution": "Ubuntu",
+  "version": "26.04 LTS",
+  "codename": "Resolute Raccoon",
+  "suite": "resolute",
+  "components": ["main"],
+  "architectures": ["arm64", "armhf"],
+  "android_abi_mapping": {
+    "arm64-v8a": "arm64",
+    "armeabi-v7a": "armhf"
+  },
+  "repository_status": "preparation",
+  "signed": false,
+  "packages_published": false
+}
