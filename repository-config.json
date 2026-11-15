@@ -9,7 +9,9 @@
     "arm64-v8a": "arm64",
     "armeabi-v7a": "armhf"
   },
-  "repository_status": "preparation",
-  "signed": false,
+  "official_packages_source": "Ubuntu official repositories",
+  "custom_packages_prefix": "lnxterminal-",
+  "repository_status": "custom_repository_preparation",
+  "signed": true,
   "packages_published": false
 }
