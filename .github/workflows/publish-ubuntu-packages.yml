@@ -65,7 +65,24 @@ jobs:
           apt-ftparchive packages pool/main > dists/resolute/main/binary-arm64/Packages
           gzip -9c dists/resolute/main/binary-arm64/Packages > dists/resolute/main/binary-arm64/Packages.gz
           apt-ftparchive release dists/resolute > dists/resolute/Release
-          echo "Repository metadata generated. Release is unsigned until a signing key is configured."
+          echo "Repository metadata generated."
+
+      - name: Sign APT repository metadata
+        env:
+          APT_SIGNING_PRIVATE_KEY: ${{ secrets.APT_SIGNING_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$APT_SIGNING_PRIVATE_KEY" || { echo "Missing APT_SIGNING_PRIVATE_KEY repository secret."; exit 1; }
+          export GNUPGHOME="$RUNNER_TEMP/lnxterminal-gnupg"
+          mkdir -m 700 -p "$GNUPGHOME"
+          printf '%s\n' "$APT_SIGNING_PRIVATE_KEY" | gpg --batch --import
+          fingerprint="CD1381B2BFF1041A38EF2988B049401FAF0C9C5F"
+          gpg --batch --list-secret-keys "$fingerprint" >/dev/null
+          gpg --batch --yes --local-user "$fingerprint" --armor --detach-sign \
+            --output dists/resolute/Release.gpg dists/resolute/Release
+          gpg --batch --yes --local-user "$fingerprint" --clearsign \
+            --output dists/resolute/InRelease dists/resolute/Release
+          echo "APT Release metadata signed successfully."
 
       - name: Commit and publish packages
         run: |
